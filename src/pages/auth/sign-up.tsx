@@ -30,11 +30,6 @@ export function SignUp() {
   const handleSignUp = useCallback(
     async ({ restaurantName, managerName, email, phone }: ISignUpFormData) => {
       try {
-        console.log(restaurantName);
-        console.log(managerName);
-        console.log(email);
-        console.log(phone);
-
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
         toast.success('Restaurante cadastrado com sucesso!', {
