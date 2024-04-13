@@ -4,4 +4,4 @@ const envSchema = zod.object({
   VITE_API_URL: zod.string().url(),
 });
 
-export const env = envSchema.parse(import.meta.env.BASE_URL);
+export const env = envSchema.parse(import.meta.env);
