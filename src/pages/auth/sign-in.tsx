@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { z as zod } from 'zod';
 
@@ -18,30 +18,39 @@ const signInFormData = zod.object({
 type ISignInFormData = zod.infer<typeof signInFormData>;
 
 export function SignIn() {
+  const [searchParams] = useSearchParams();
+
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<ISignInFormData>();
+  } = useForm<ISignInFormData>({
+    defaultValues: {
+      email: searchParams.get('email') ?? '',
+    },
+  });
 
   const { mutateAsync: authenticate } = useMutation({
     mutationFn: signIn,
   });
 
-  const handleSignIn = useCallback(async ({ email }: ISignInFormData) => {
-    try {
-      await authenticate({ email });
+  const handleSignIn = useCallback(
+    async ({ email }: ISignInFormData) => {
+      try {
+        await authenticate({ email });
 
-      toast.success('Enviamos um link de autenticação para seu e-mail.', {
-        action: {
-          label: 'Reenviar',
-          onClick: () => handleSignIn({ email }),
-        },
-      });
-    } catch (err) {
-      toast.error('Credenciais inválidas.');
-    }
-  }, []);
+        toast.success('Enviamos um link de autenticação para seu e-mail.', {
+          action: {
+            label: 'Reenviar',
+            onClick: () => handleSignIn({ email }),
+          },
+        });
+      } catch (err) {
+        toast.error('Credenciais inválidas.');
+      }
+    },
+    [authenticate],
+  );
 
   return (
     <>
