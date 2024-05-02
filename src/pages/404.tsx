@@ -7,7 +7,7 @@ export function NotFound() {
       <p className="text-accent-foreground">
         Voltar para o{' '}
         <Link to="/" className="text-sky-500 dark:text-sky-400">
-          Dasboard
+          Dashboard
         </Link>
       </p>
     </div>

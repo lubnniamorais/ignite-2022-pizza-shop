@@ -21,12 +21,17 @@ export function AccountMenu() {
   const { data: profile, isLoading: isLoadingProfile } = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    staleTime: Infinity,
   });
 
   const { data: managedRestaurant, isLoading: isLoadingManagedRestaurant } =
     useQuery({
       queryKey: ['managed-restaurant'],
       queryFn: getManagedRestaurant,
+      staleTime: Infinity,
+      // o tempo é customizado em milissegundos, logo 1000 milissegundos é igual a 1 segundo,
+      // no entanto, quando passamoso valor Infinity, significa que nunca será recarregado
+      // automaticamente os dados.
     });
 
   return (
