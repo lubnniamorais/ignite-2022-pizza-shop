@@ -26,7 +26,7 @@ import { Textarea } from './ui/textarea';
 
 const storeProfileSchema = zod.object({
   name: zod.string().min(3),
-  description: zod.string().min(5),
+  description: zod.string().nullable(),
 });
 
 type StoreProfileSchemaData = zod.infer<typeof storeProfileSchema>;
@@ -55,9 +55,8 @@ export function StoreProfileDialog() {
     },
   });
 
-  const { mutateAsync: updateProfileFn } = useMutation({
-    mutationFn: updateProfile,
-    onSuccess(_, { name, description }) {
+  const updateManagedRestaurantCache = useCallback(
+    async ({ name, description }: StoreProfileSchemaData) => {
       const cached = queryClient.getQueryData<GetManagedRestaurantResponse>([
         'managed-restaurant',
       ]);
@@ -71,6 +70,28 @@ export function StoreProfileDialog() {
             description,
           },
         );
+      }
+
+      // Aqui retorna os dados antes deles serem atualizados
+      return { cached };
+    },
+    [queryClient],
+  );
+
+  const { mutateAsync: updateProfileFn } = useMutation({
+    mutationFn: updateProfile,
+    onMutate: async ({ name, description }) => {
+      const { cached } = await updateManagedRestaurantCache({
+        name,
+        description,
+      });
+
+      return { previousProfile: cached };
+    },
+    onError(_, __, context) {
+      if (context?.previousProfile) {
+        // Caso aconteça um erro então passamos os dados antes de atualizar o cache
+        updateManagedRestaurantCache(context.previousProfile);
       }
     },
   });
